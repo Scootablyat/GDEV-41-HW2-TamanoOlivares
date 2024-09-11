@@ -53,6 +53,44 @@ bool TimerDone(Timer *timer)
     }
 }
 
+int GetKey(std::string key){
+    if(key == "KEY_RIGHT"){
+        return KEY_RIGHT;
+    }
+    if(key == "KEY_LEFT"){
+        return KEY_LEFT;
+    }
+    if(key == "KEY_UP"){
+        return KEY_UP;
+    }
+    if(key == "KEY_DOWN"){
+        return KEY_DOWN;
+    }
+    if(key == "MOUSE_LEFT"){
+        return MOUSE_BUTTON_LEFT;
+    }
+    if(key == "MOUSE_RIGHT"){
+        return MOUSE_BUTTON_RIGHT;
+    }
+    if(key == "MOUSE_MIDDLE"){
+        return MOUSE_BUTTON_MIDDLE;
+    }
+    if(key == "KEY_SPACE"){
+        return KEY_SPACE;
+    }
+}
+
+int GetKeyCode(std::string x){
+    if(x.length() == 1){
+        char y = x[0];
+        return y - '0' + 48;
+    }
+    else{
+        return GetKey(x);
+    }
+
+}
+
 float RandomDirection()
 {
     float x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
@@ -159,27 +197,27 @@ int getSettings(std::string setting)
             if (line.find("increaseKeyEmissionRate") == 0 && setting == "increaseKeyEmissionRate")
             {
                 // std::cout << "KeyCode: " << line.erase(0, line.find(" ") + 1) << std::endl;
-                return stoi(line.erase(0, line.find(" ") + 1));
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
             }
             if (line.find("reduceKeyEmissionRate") == 0 && setting == "reduceKeyEmissionRate")
             {
-                return stoi(line.erase(0, line.find(" ") + 1));
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
             }
             if (line.find("increaseMouseEmissionRate") == 0 && setting == "increaseMouseEmissionRate")
             {
-                return stoi(line.erase(0, line.find(" ") + 1));
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
             }
             if (line.find("reduceMouseEmissionRate") == 0 && setting == "reduceMouseEmissionRate")
             {
-                return stoi(line.erase(0, line.find(" ") + 1));
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
             }
             if (line.find("activateKeyParticles") == 0 && setting == "activateKeyParticles")
             {
-                return stoi(line.erase(0, line.find(" ") + 1));
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
             }
             if (line.find("activateMouseParticles") == 0 && setting == "activateMouseParticles")
             {
-                return stoi(line.erase(0, line.find(" ") + 1));
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
             }
         }
     }
