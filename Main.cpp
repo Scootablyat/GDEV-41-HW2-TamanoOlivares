@@ -197,7 +197,8 @@ int main()
 
     int particleArraySize = 1000;
     int KeyEmissionRate = 30, mouseEmissionRate = 30; // particles per second
-    float secondsPerKeyEmission = 1.0f / KeyEmissionRate;
+    float secondsPerKeyEmission = 1.0f / KeyEmissionRate; 
+    float secondsPerMouseEmission = 1.0f / mouseEmissionRate;
     Particle *particleArray = new Particle[particleArraySize];
     int width = 800;
     int height = 600;
@@ -237,9 +238,9 @@ int main()
 
         if (IsMouseButtonDown(activateMouseParticles))
         {
-            while (timeElapsed >= secondsPerKeyEmission){
+            while (timeElapsed >= secondsPerMouseEmission){
                 InitializeMouseParticle(particleArray, particleArraySize);
-                timeElapsed -= secondsPerKeyEmission;
+                timeElapsed -= secondsPerMouseEmission;
             }
             
 
