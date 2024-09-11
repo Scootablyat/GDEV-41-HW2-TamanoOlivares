@@ -207,6 +207,8 @@ int main()
     Particle *particleArray = new Particle[particleArraySize];
     int width = 800;
     int height = 600;
+    std::cout << secondsPerKeyEmission << std::endl;
+    std::cout << secondsPerMouseEmission << std::endl;
     InitWindow(width, height, "Homework 2 - Tamano/Olivares - Particle System");
 
     float timeElapsed;
@@ -216,7 +218,6 @@ int main()
     {
         // calculations
         float deltaTime = GetFrameTime();
-        timeElapsed += deltaTime;
         // float emissionsPerSecond = KeyEmissionRate / 1000.0f;
         //  std::cout << emissionsPerSecond << std::endl;
 
@@ -224,23 +225,32 @@ int main()
         if (IsKeyPressed(increaseKeyEmissionRate))
         {
             KeyEmissionRate = (KeyEmissionRate >= 50) ? 50 : KeyEmissionRate + 1;
+            secondsPerKeyEmission = 1.0f / KeyEmissionRate;
+            std::cout << "Keyboard emmision rate: " << KeyEmissionRate << " / emission per second: " << secondsPerKeyEmission << std::endl;
         }
         if (IsKeyPressed(reduceKeyEmissionRate))
         {
             KeyEmissionRate = (KeyEmissionRate <= 1) ? 1 : KeyEmissionRate - 1;
+            secondsPerKeyEmission = 1.0f / KeyEmissionRate;
+            std::cout << "Keyboard emmision rate: " << KeyEmissionRate << " / emission per second: " << secondsPerKeyEmission << std::endl;
         }
         if (IsKeyPressed(increaseMouseEmissionRate))
         {
             mouseEmissionRate = (mouseEmissionRate >= 50) ? 50 : mouseEmissionRate + 1;
+            secondsPerMouseEmission = 1.0f / mouseEmissionRate;
+            std::cout << "Mouse emmision rate: " << mouseEmissionRate << " / emission per second: " << secondsPerMouseEmission << std::endl;
         }
         if (IsKeyPressed(reduceMouseEmissionRate))
         {
             mouseEmissionRate = (mouseEmissionRate <= 1) ? 1 : mouseEmissionRate - 1;
+            secondsPerMouseEmission = 1.0f / mouseEmissionRate;
+            std::cout << "Mouse emmision rate: " << mouseEmissionRate << " / emission per second: " << secondsPerMouseEmission << std::endl;
         }
 
         if (IsMouseButtonDown(activateMouseParticles))
         {
-            while (timeElapsed >= secondsPerMouseEmission)
+            timeElapsed += deltaTime;
+            if (timeElapsed >= secondsPerMouseEmission)
             {
                 InitializeParticle(particleArray, particleArraySize, true);
                 timeElapsed -= secondsPerMouseEmission;
@@ -249,7 +259,8 @@ int main()
 
         if (IsKeyDown(activateKeyParticles))
         {
-            while (timeElapsed >= secondsPerKeyEmission)
+            timeElapsed += deltaTime;
+            if (timeElapsed >= secondsPerKeyEmission)
             {
                 InitializeParticle(particleArray, particleArraySize, false);
                 timeElapsed -= secondsPerKeyEmission;
@@ -260,7 +271,7 @@ int main()
         BeginDrawing();
 
         ClearBackground(BLACK); // black so it's easier to see the particles
-        EmitParticles(particleArray, KeyEmissionRate, deltaTime);
+        EmitParticles(particleArray, particleArraySize, deltaTime);
 
         EndDrawing();
     }
