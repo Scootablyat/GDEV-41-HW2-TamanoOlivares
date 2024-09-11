@@ -53,7 +53,95 @@ bool TimerDone(Timer *timer)
     }
 }
 
-float RandomDirection()
+int GetKey(std::string key)
+{
+    if (key == "KEY_RIGHT")
+    {
+        return KEY_RIGHT;
+    }
+    if (key == "KEY_LEFT")
+    {
+        return KEY_LEFT;
+    }
+    if (key == "KEY_UP")
+    {
+        return KEY_UP;
+    }
+    if (key == "KEY_DOWN")
+    {
+        return KEY_DOWN;
+    }
+    if (key == "MOUSE_LEFT")
+    {
+        return MOUSE_BUTTON_LEFT;
+    }
+    if (key == "MOUSE_RIGHT")
+    {
+        return MOUSE_BUTTON_RIGHT;
+    }
+    if (key == "MOUSE_MIDDLE")
+    {
+        return MOUSE_BUTTON_MIDDLE;
+    }
+    if (key == "KEY_SPACE")
+    {
+        return KEY_SPACE;
+    }
+}
+
+int GetKeyCode(std::string x)
+{
+    if (x.length() == 1)
+    {
+        char y = x[0];
+        return y - '0' + 48;
+    }
+    else
+    {
+        return GetKey(x);
+    }
+}
+
+int getSettings(std::string setting)
+{
+    std::fstream settingsFile;
+    settingsFile.open("config.ini", std::ios::in);
+    std::string line;
+    if (settingsFile.is_open())
+    {
+        while (std::getline(settingsFile, line))
+        {
+            if (line.find("increaseKeyEmissionRate") == 0 && setting == "increaseKeyEmissionRate")
+            {
+                // std::cout << "KeyCode: " << line.erase(0, line.find(" ") + 1) << std::endl;
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
+            }
+            if (line.find("reduceKeyEmissionRate") == 0 && setting == "reduceKeyEmissionRate")
+            {
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
+            }
+            if (line.find("increaseMouseEmissionRate") == 0 && setting == "increaseMouseEmissionRate")
+            {
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
+            }
+            if (line.find("reduceMouseEmissionRate") == 0 && setting == "reduceMouseEmissionRate")
+            {
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
+            }
+            if (line.find("activateKeyParticles") == 0 && setting == "activateKeyParticles")
+            {
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
+            }
+            if (line.find("activateMouseParticles") == 0 && setting == "activateMouseParticles")
+            {
+                return GetKeyCode(line.erase(0, line.find(" = ") + 3));
+            }
+        }
+    }
+    return 0;
+}
+
+float GetRandomDirection()
 {
     float x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
@@ -61,52 +149,50 @@ float RandomDirection()
     return x * 2.0f - 1.0f;
 }
 
-void InitializeKeyParticle(Particle *array, int arraySize)
+void InitializeParticle(Particle *array, int arraySize, bool usingMouse)
 {
     for (size_t i = 0; i < arraySize; i++)
     {
         if (array[i].isActive == false)
         {
-            array[i].isActive = true;
-            array[i].position.x = 400; // changed so that all are spawned in the middle
-            array[i].position.y = 600;
-            array[i].direction.x = RandomDirection();
-            array[i].direction.y = -1;
-            array[i].speed = GetRandomValue(50, 100);
-            array[i].lifeTime = GetRandomValue(2.0, 5.0);
-            array[i].totalTime = array[i].lifeTime;
-            Color randomColor = {
-                GetRandomValue(0, 255),
-                GetRandomValue(0, 255),
-                GetRandomValue(0, 255),
-                255};
-            array[i].color = randomColor;
-            // std::cout << "Initialized Particle: " << i << std::endl;
-            break;
-        }
-    }
-}
-
-void InitializeMouseParticle(Particle *array, int arraySize)
-{
-    for (size_t i = 0; i < arraySize; i++)
-    {
-        if (array[i].isActive == false)
-        {
-            array[i].isActive = true;
-            array[i].position.x = GetMousePosition().x;
-            array[i].position.y = GetMousePosition().y;
-            array[i].direction.x = RandomDirection();
-            array[i].direction.y = RandomDirection();
-            array[i].speed = GetRandomValue(50, 100);
-            array[i].lifeTime = GetRandomValue(0.5, 2.0);
-            Color randomColor = {
-                GetRandomValue(0, 255),
-                GetRandomValue(0, 255),
-                GetRandomValue(0, 255),
-                255};
-            array[i].color = randomColor;
-            break;
+            if (usingMouse)
+            {
+                array[i].isActive = true;
+                array[i].position.x = GetMousePosition().x;
+                array[i].position.y = GetMousePosition().y;
+                array[i].direction.x = GetRandomDirection();
+                array[i].direction.y = GetRandomDirection();
+                array[i].speed = GetRandomValue(50, 100);
+                array[i].lifeTime = GetRandomValue(0.5, 2.0);
+                array[i].totalTime = array[i].lifeTime;
+                Color randomColor = {
+                    GetRandomValue(0, 255),
+                    GetRandomValue(0, 255),
+                    GetRandomValue(0, 255),
+                    255};
+                array[i].color = randomColor;
+                std::cout << "Initialized Particle: " << i << std::endl;
+                break;
+            }
+            else if (!usingMouse)
+            {
+                array[i].isActive = true;
+                array[i].position.x = 400.0f; // changed so that all are spawned in the middle
+                array[i].position.y = 600.0f;
+                array[i].direction.x = GetRandomDirection();
+                array[i].direction.y = -1;
+                array[i].speed = GetRandomValue(50, 100);
+                array[i].lifeTime = GetRandomValue(2.0, 5.0);
+                array[i].totalTime = array[i].lifeTime;
+                Color randomColor = {
+                    GetRandomValue(0, 255),
+                    GetRandomValue(0, 255),
+                    GetRandomValue(0, 255),
+                    255};
+                array[i].color = randomColor;
+                std::cout << "Initialized Particle: " << i << std::endl;
+                break;
+            }
         }
     }
 }
@@ -126,64 +212,17 @@ void UpdateParticle(Particle *particle, float deltaTime)
     }
 }
 
-// void initializeParticleArray(Particle *array, int arraySize)
-// {
-//     for (size_t i = 0; i < arraySize; i++)
-//     {
-//         InitializeKeyParticle(array[i]); // passing pointers wrong
-//     }
-// }
-
 void EmitParticles(Particle *array, int arraySize, float deltaTime)
 {
     for (size_t i = 0; i < arraySize; i++)
     {
         UpdateParticle(&array[i], deltaTime);
-        if (array[i].lifeTime != 0)
+        if (array[i].lifeTime != 0 && array[i].isActive == true)
         {
-            // std::cout<< array[i].position.x << " " << array[i].position.y << std::endl;
+            // std::cout << array[i].position.x << " " << array[i].position.y << std::endl;
             DrawCircle(array[i].position.x, array[i].position.y, 5, array[i].color);
         }
     }
-}
-
-int getSettings(std::string setting)
-{
-    std::fstream settingsFile;
-    settingsFile.open("config.ini", std::ios::in);
-    std::string line;
-    if (settingsFile.is_open())
-    {
-        while (std::getline(settingsFile, line))
-        {
-            if (line.find("increaseKeyEmissionRate") == 0 && setting == "increaseKeyEmissionRate")
-            {
-                // std::cout << "KeyCode: " << line.erase(0, line.find(" ") + 1) << std::endl;
-                return stoi(line.erase(0, line.find(" ") + 1));
-            }
-            if (line.find("reduceKeyEmissionRate") == 0 && setting == "reduceKeyEmissionRate")
-            {
-                return stoi(line.erase(0, line.find(" ") + 1));
-            }
-            if (line.find("increaseMouseEmissionRate") == 0 && setting == "increaseMouseEmissionRate")
-            {
-                return stoi(line.erase(0, line.find(" ") + 1));
-            }
-            if (line.find("reduceMouseEmissionRate") == 0 && setting == "reduceMouseEmissionRate")
-            {
-                return stoi(line.erase(0, line.find(" ") + 1));
-            }
-            if (line.find("activateKeyParticles") == 0 && setting == "activateKeyParticles")
-            {
-                return stoi(line.erase(0, line.find(" ") + 1));
-            }
-            if (line.find("activateMouseParticles") == 0 && setting == "activateMouseParticles")
-            {
-                return stoi(line.erase(0, line.find(" ") + 1));
-            }
-        }
-    }
-    return 0;
 }
 
 int main()
@@ -196,7 +235,10 @@ int main()
     int activateMouseParticles = getSettings("activateMouseParticles");
 
     int particleArraySize = 1000;
-    int KeyEmissionRate = 30, mouseEmissionRate = 30;
+    int KeyEmissionRate = 30;
+    int mouseEmissionRate = 30; // particles per second
+    float secondsPerKeyEmission = 1.0f / KeyEmissionRate;
+    float secondsPerMouseEmission = 1.0f / mouseEmissionRate;
     Particle *particleArray = new Particle[particleArraySize];
     int width = 800;
     int height = 600;
@@ -205,15 +247,13 @@ int main()
     std::srand(GetFrameTime());
     Timer particleTimer = {1};
     int particlesInitialized = 0;
-
-    // initializeParticleArray(particleArray, particleArraySize);
+    float timeElapsed;
 
     while (!WindowShouldClose())
     {
         // calculations
         float deltaTime = GetFrameTime();
-        float emissionsPerSecond = KeyEmissionRate / 1000.0f;
-        // std::cout << emissionsPerSecond << std::endl;
+        timeElapsed += deltaTime;
 
         // controls
         if (IsKeyPressed(increaseKeyEmissionRate))
@@ -235,31 +275,26 @@ int main()
 
         if (IsMouseButtonDown(activateMouseParticles))
         {
-            InitializeMouseParticle(particleArray, particleArraySize);
+            while (timeElapsed >= secondsPerMouseEmission)
+            {
+                InitializeParticle(particleArray, particleArraySize, true);
+                timeElapsed -= secondsPerMouseEmission;
+            }
         }
 
         if (IsKeyDown(activateKeyParticles))
         {
-            // one at a time
-            // emissions per second, so wait __ milliseconds
-
-            // StartTimer(&particleTimer, emissionsPerSecond);
-
-            // UpdateTimer(&particleTimer);
-            // wait for __ miliseconds
-
-            // if (TimerDone(&particleTimer))
-            // {
-            InitializeKeyParticle(particleArray, particleArraySize);
-            // std::cout << "timer done" << std::endl;
-            // }
+            while (timeElapsed >= secondsPerKeyEmission)
+            {
+                InitializeParticle(particleArray, particleArraySize, false);
+            }
         }
 
         // drawstep
         BeginDrawing();
 
         ClearBackground(BLACK); // black so it's easier to see the particles
-        EmitParticles(particleArray, KeyEmissionRate, deltaTime);
+        // EmitParticles(particleArray, particleArraySize, deltaTime);
 
         EndDrawing();
     }
