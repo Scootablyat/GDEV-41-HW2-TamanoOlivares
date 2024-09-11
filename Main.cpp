@@ -22,37 +22,6 @@ struct Particle
     Color color;
 };
 
-// Source: https://www.youtube.com/watch?v=vGlvTWUctTQ
-// Tried doing a timer but failed, not sure how to limit the spacebar holding input
-struct Timer
-{
-    float lifeTime; // Lifetime (seconds)
-};
-
-void StartTimer(Timer *timer, float lifetime)
-{
-    if (timer != NULL)
-    {
-        timer->lifeTime = lifetime;
-    }
-}
-
-void UpdateTimer(Timer *timer)
-{
-    if (timer != NULL && timer->lifeTime > 0) // make sure timer has not expired
-    {
-        timer->lifeTime -= GetFrameTime();
-    }
-}
-
-bool TimerDone(Timer *timer)
-{
-    if (timer != NULL)
-    {
-        return timer->lifeTime <= 0;
-    }
-}
-
 int GetKey(std::string key)
 {
     if (key == "KEY_RIGHT")
@@ -155,7 +124,7 @@ void InitializeParticle(Particle *array, int arraySize, bool usingMouse)
     {
         if (array[i].isActive == false)
         {
-            if (usingMouse)
+            if (usingMouse == true)
             {
                 array[i].isActive = true;
                 array[i].position.x = GetMousePosition().x;
@@ -174,7 +143,7 @@ void InitializeParticle(Particle *array, int arraySize, bool usingMouse)
                 std::cout << "Initialized Particle: " << i << std::endl;
                 break;
             }
-            else if (!usingMouse)
+            else if (usingMouse == false)
             {
                 array[i].isActive = true;
                 array[i].position.x = 400.0f; // changed so that all are spawned in the middle
@@ -245,7 +214,6 @@ int main()
     InitWindow(width, height, "Homework 2 - Tamano/Olivares - Particle System");
 
     std::srand(GetFrameTime());
-    Timer particleTimer = {1};
     int particlesInitialized = 0;
     float timeElapsed;
 
@@ -287,6 +255,7 @@ int main()
             while (timeElapsed >= secondsPerKeyEmission)
             {
                 InitializeParticle(particleArray, particleArraySize, false);
+                timeElapsed -= secondsPerKeyEmission;
             }
         }
 
@@ -294,7 +263,7 @@ int main()
         BeginDrawing();
 
         ClearBackground(BLACK); // black so it's easier to see the particles
-        // EmitParticles(particleArray, particleArraySize, deltaTime);
+        EmitParticles(particleArray, particleArraySize, deltaTime);
 
         EndDrawing();
     }
