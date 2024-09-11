@@ -196,7 +196,8 @@ int main()
     int activateMouseParticles = getSettings("activateMouseParticles");
 
     int particleArraySize = 1000;
-    int KeyEmissionRate = 30, mouseEmissionRate = 30;
+    int KeyEmissionRate = 30, mouseEmissionRate = 30; // particles per second
+    float secondsPerKeyEmission = 1.0f / KeyEmissionRate;
     Particle *particleArray = new Particle[particleArraySize];
     int width = 800;
     int height = 600;
@@ -205,14 +206,15 @@ int main()
     std::srand(GetFrameTime());
     Timer particleTimer = {1};
     int particlesInitialized = 0;
-
+    float timeElapsed;
     // initializeParticleArray(particleArray, particleArraySize);
 
     while (!WindowShouldClose())
     {
         // calculations
         float deltaTime = GetFrameTime();
-        float emissionsPerSecond = KeyEmissionRate / 1000.0f;
+        timeElapsed += deltaTime;
+        //float emissionsPerSecond = KeyEmissionRate / 1000.0f;
         // std::cout << emissionsPerSecond << std::endl;
 
         // controls
@@ -235,7 +237,12 @@ int main()
 
         if (IsMouseButtonDown(activateMouseParticles))
         {
-            InitializeMouseParticle(particleArray, particleArraySize);
+            while (timeElapsed >= secondsPerKeyEmission){
+                InitializeMouseParticle(particleArray, particleArraySize);
+                timeElapsed -= secondsPerKeyEmission;
+            }
+            
+
         }
 
         if (IsKeyDown(activateKeyParticles))
@@ -250,7 +257,10 @@ int main()
 
             // if (TimerDone(&particleTimer))
             // {
-            InitializeKeyParticle(particleArray, particleArraySize);
+            while (timeElapsed >= secondsPerKeyEmission){
+                InitializeKeyParticle(particleArray, particleArraySize);
+                timeElapsed -= secondsPerKeyEmission;
+            }
             // std::cout << "timer done" << std::endl;
             // }
         }
